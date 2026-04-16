@@ -5,7 +5,7 @@ Classify brain MRI reports using DeepSeek-R1-Distill-Qwen-32B via vLLM.
 Valid output labels: 1, 2, 3
 
 Input  (INPUT_CSV_PATH):      CSV with columns [id, json_report]
-Output (OUTPUT_CSV_PATH):     CSV with columns [id, result, raw_output]
+Output (OUTPUT_CSV_PATH):     CSV with columns [id, result_cls, raw_output]
        (INVALID_LABELS_PATH): CSV listing IDs whose label fell outside {1, 2, 3}
 
 Configure paths in the constants block below, then run:
@@ -104,14 +104,14 @@ def batch_process_reports(llm, sampling_params, system_message, reports, batch_s
             for j, output in enumerate(outputs):
                 result_text = output.outputs[0].text.strip()
                 label = extract_label(result_text)
-                results.append({'id': batch[j]['id'], 'result': label, 'raw_output': result_text})
+                results.append({'id': batch[j]['id'], 'result_cls': label, 'raw_output': result_text})
                 if label not in VALID_LABELS:
                     print(f"[WARN] Invalid label: {batch[j]['id']} — raw: {result_text}")
                     bad_ids.append(batch[j]['id'])
         except Exception as e:
             print(f"[ERROR] Batch {i} failed: {e}")
             for row in batch:
-                results.append({'id': row['id'], 'result': None, 'raw_output': f"[ERROR] {e}"})
+                results.append({'id': row['id'], 'result_cls': None, 'raw_output': f"[ERROR] {e}"})
     return results, bad_ids
 
 
