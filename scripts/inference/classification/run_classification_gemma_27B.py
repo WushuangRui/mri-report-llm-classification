@@ -124,7 +124,8 @@ input:
   "additional_findings": null
 }
 
-Example Output:3
+Example Output:
+3
 """
     # Keep as-is; do not modify the few-shot example fed to the LLM
     example_assistant = "3"
