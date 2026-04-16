@@ -4,30 +4,38 @@ run_classification_qwen3.py
 Classify brain MRI reports using Qwen3-32B via vLLM.
 Valid output labels: 1, 2, 3
 
-Input  (INPUT_CSV_PATH):      CSV with columns [id, json_report]
-Output (OUTPUT_CSV_PATH):     CSV with columns [id, result_cls, raw_output]
-       (INVALID_LABELS_PATH): CSV listing IDs whose label fell outside {1, 2, 3}
+Input  (--in_csv):      CSV with columns [id, json_report]
+Output (--out_csv):     CSV with columns [id, result_cls, raw_output]
+       (--invalid_csv): CSV listing IDs whose label fell outside {1, 2, 3}
 
-Configure paths in the constants block below, then run:
-    python run_classification_qwen3.py
+Usage:
+    python run_classification_qwen3.py \
+        --model       /path/to/Qwen3-32B \
+        --in_csv      /path/to/input.csv \
+        --prompt_path /path/to/prompt.txt \
+        --out_csv     /path/to/output.csv \
+        --invalid_csv /path/to/invalid.csv
 """
 
 import re
+import argparse
 import pandas as pd
 from tqdm import tqdm
 import os
 os.environ["TORCHDYNAMO_DISABLE"] = "1"
 from vllm import LLM, SamplingParams
 
-# ── Paths (edit before running) ───────────────────────────────────────────────
-MODEL_PATH          = "/gpfs/data/shenlab/LLMs/Qwen3-32B"
-INPUT_CSV_PATH      = "/gpfs/home/wr2215/ms_mri_deepseek/mri_classification/processed_json_test_subset680.csv"
-PROMPT_FILE_PATH    = "/gpfs/home/wr2215/ms_mri_deepseek/mri_classification/prompt&result/prompt_classification_14.txt"
-OUTPUT_CSV_PATH     = "/gpfs/home/wr2215/ms_mri_qwen3/processed_reports_classification_qw_14_680.csv"
-INVALID_LABELS_PATH = "/gpfs/home/wr2215/ms_mri_qwen3/invalid_labels_qwen3_14_680.csv"
-# ─────────────────────────────────────────────────────────────────────────────
-
 VALID_LABELS = {1, 2, 3}
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="MRI report classification with Qwen3 via vLLM")
+    parser.add_argument("--model",       required=True, help="Path to model weights")
+    parser.add_argument("--in_csv",      required=True, help="Input CSV path")
+    parser.add_argument("--prompt_path", required=True, help="Prompt txt path")
+    parser.add_argument("--out_csv",     required=True, help="Output CSV path")
+    parser.add_argument("--invalid_csv", required=True, help="Invalid labels CSV path")
+    return parser.parse_args()
 
 
 def load_system_message(file_path):
@@ -87,8 +95,7 @@ def extract_label(text: str):
 
 
 def batch_process_reports(llm, sampling_params, system_message, reports, batch_size=8):
-    results = []
-    bad_ids = []
+    results, bad_ids = [], []
     for i in tqdm(range(0, len(reports), batch_size), desc="Processing reports"):
         batch = reports[i:i + batch_size]
         batch_prompts = [build_prompt(system_message, row['id'], row['json_report']) for row in batch]
@@ -109,24 +116,26 @@ def batch_process_reports(llm, sampling_params, system_message, reports, batch_s
 
 
 def main():
-    llm = LLM(model=MODEL_PATH, max_model_len=8192, gpu_memory_utilization=0.95)
+    args = parse_args()
+
+    llm = LLM(model=args.model, max_model_len=8192, gpu_memory_utilization=0.95)
 
     # Qwen3 is a reasoning model; keep max_tokens high for chain-of-thought,
     # use temperature=0.0 for deterministic classification output.
     sampling_params = SamplingParams(max_tokens=2048, temperature=0.0, top_p=1.0, top_k=-1)
 
-    df = pd.read_csv(INPUT_CSV_PATH)
-    system_message = load_system_message(PROMPT_FILE_PATH)
+    df = pd.read_csv(args.in_csv)
+    system_message = load_system_message(args.prompt_path)
     results, bad_ids = batch_process_reports(llm, sampling_params, system_message,
                                              df.to_dict(orient="records"), batch_size=8)
 
-    os.makedirs(os.path.dirname(OUTPUT_CSV_PATH), exist_ok=True)
-    pd.DataFrame(results).to_csv(OUTPUT_CSV_PATH, index=False)
-    print(f"[INFO] Done. Results saved to {OUTPUT_CSV_PATH}")
+    os.makedirs(os.path.dirname(args.out_csv) or ".", exist_ok=True)
+    pd.DataFrame(results).to_csv(args.out_csv, index=False)
+    print(f"[INFO] Done. Results saved to {args.out_csv}")
 
-    os.makedirs(os.path.dirname(INVALID_LABELS_PATH), exist_ok=True)
-    pd.DataFrame({"bad_id": bad_ids}).to_csv(INVALID_LABELS_PATH, index=False)
-    print(f"[INFO] Invalid label count: {len(bad_ids)}, saved to {INVALID_LABELS_PATH}")
+    os.makedirs(os.path.dirname(args.invalid_csv) or ".", exist_ok=True)
+    pd.DataFrame({"bad_id": bad_ids}).to_csv(args.invalid_csv, index=False)
+    print(f"[INFO] Invalid label count: {len(bad_ids)}, saved to {args.invalid_csv}")
 
 
 if __name__ == "__main__":
