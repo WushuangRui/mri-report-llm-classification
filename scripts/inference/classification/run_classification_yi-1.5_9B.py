@@ -88,17 +88,52 @@ def build_prompt(system_message: str, report_id, report_input):
         {"role": "user", "content": "Here's an example of how to process a report:"},
         {"role": "user", "content": """
 Example Input:
-ID: 6
+ID: M0005
 input:
-Clinical indication:
-39-year-old female headache.
-
-Findings:
-...
-
-Impression:
-Mild interval increase in size with associated minimal vasogenic edema of the paramedian left precentral
-gyral cavernous malformation.
+{
+  "quality_dec": false,
+  "clinical_indication": [
+    {
+      "age": null,
+      "gender": null,
+      "symptom": null,
+      "history": null
+    }
+  ],
+  "comparison": [],
+  "lesions": [
+    {
+      "type": "demyelinating lesions",
+      "location": [
+        {
+          "side": null,
+          "region": [
+            "periventricular",
+            "juxtacortical",
+            "infratentorial white matter"
+          ]
+        }
+      ],
+      "size": null,
+      "radiological_changes": {
+        "T2/FLAIR": [
+          "hyperintensity"
+        ]
+      },
+      "characteristics": [
+        "ovoid",
+        "Dawson fingers"
+      ],
+      "compare_pre": null,
+      "diagnosis": {
+        "multiple sclerosis": [
+          "highly suggestive"
+        ]
+      }
+    }
+  ],
+  "additional_findings": null
+}
 
 Example Output:
 3
