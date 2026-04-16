@@ -8,7 +8,7 @@ Valid output labels: 1, 2, 3
 The model is prompted to return a single digit; max_tokens is set to 4.
 
 Input  (INPUT_CSV_PATH):      CSV with columns [id, json_report]
-Output (OUTPUT_CSV_PATH):     CSV with columns [id, result, raw_output]
+Output (OUTPUT_CSV_PATH):     CSV with columns [id, result_cls, raw_output]
        (INVALID_LABELS_PATH): CSV listing IDs whose label fell outside {1, 2, 3}
 
 All paths and runtime parameters can be overridden via environment variables:
@@ -40,8 +40,8 @@ INVALID_LABELS_PATH = os.environ.get("INVALID_LABELS_PATH",
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Runtime parameters (overridable via environment variables) ────────────────
-TP_SIZE       = int(os.environ.get("TP_SIZE", "1"))         # set to GPU count for multi-GPU
-BATCH_SIZE    = int(os.environ.get("BATCH_SIZE", "8"))      # reduce to 4/2/1 if VRAM is tight
+TP_SIZE       = int(os.environ.get("TP_SIZE", "1"))          # set to GPU count for multi-GPU
+BATCH_SIZE    = int(os.environ.get("BATCH_SIZE", "8"))       # reduce to 4/2/1 if VRAM is tight
 MAX_MODEL_LEN = int(os.environ.get("MAX_MODEL_LEN", "8192")) # supports up to 16384
 GPU_MEM_UTIL  = float(os.environ.get("GPU_MEM_UTIL", "0.95"))
 SEED          = int(os.environ.get("SEED", "1"))
@@ -143,7 +143,7 @@ def extract_label(text: str):
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 def batch_process_reports(llm: LLM, sampling_params: SamplingParams,
                           system_message: str, reports, batch_size=8):
-    results, bad_ids, raw_full_jsonl = [], [], []
+    results, bad_ids = [], []
 
     for i in tqdm(range(0, len(reports), batch_size), desc="Processing reports"):
         batch = reports[i:i + batch_size]
@@ -159,12 +159,10 @@ def batch_process_reports(llm: LLM, sampling_params: SamplingParams,
 
                 label = extract_label(result_text)
                 results.append({
-                    "id": batch[j]["id"],
-                    "result": label,
+                    "id":         batch[j]["id"],
+                    "result_cls": label,
                     "raw_output": sanitize_one_line(result_text),
                 })
-                raw_full_jsonl.append({"id": batch[j]["id"], "raw_output_full": result_text})
-
                 if label not in VALID_LABELS:
                     print(f"[WARN] Invalid output: {batch[j]['id']} — raw: {sanitize_one_line(result_text)[:200]}")
                     bad_ids.append(batch[j]["id"])
@@ -172,11 +170,10 @@ def batch_process_reports(llm: LLM, sampling_params: SamplingParams,
         except Exception as e:
             err = f"[ERROR] {e}"
             for row in batch:
-                results.append({"id": row["id"], "result": None, "raw_output": err})
-                raw_full_jsonl.append({"id": row["id"], "raw_output_full": err})
+                results.append({"id": row["id"], "result_cls": None, "raw_output": err})
                 bad_ids.append(row["id"])
 
-    return results, bad_ids, raw_full_jsonl
+    return results, bad_ids
 
 
 def main():
@@ -195,15 +192,13 @@ def main():
         raise ValueError(f"Input CSV must contain columns: {need_cols}")
 
     system_message = load_system_message(PROMPT_FILE_PATH)
-    results, bad_ids, _ = batch_process_reports(
+    results, bad_ids = batch_process_reports(
         llm, sampling_params, system_message, df.to_dict(orient="records"), BATCH_SIZE)
 
     os.makedirs(os.path.dirname(OUTPUT_CSV_PATH), exist_ok=True)
     df_out = pd.DataFrame(results)
-    if "result" in df_out.columns:
-        # Use nullable integer to avoid 3.0 formatting
-        df_out["result"] = df_out["result"].astype("Int64")
-
+    # Use nullable integer to avoid 3.0 formatting
+    df_out["result_cls"] = df_out["result_cls"].astype("Int64")
     df_out.to_csv(OUTPUT_CSV_PATH, index=False, quoting=csv.QUOTE_ALL,
                   escapechar="\\", lineterminator="\n", encoding="utf-8")
     print(f"[INFO] Done. Results saved to {OUTPUT_CSV_PATH}")
