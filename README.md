@@ -1,2 +1,17 @@
-# mri-report-llm-classification
-LLM-based pipeline for brain MRI report classification using structured JSON extraction and multi-model ensemble. Filters clinical diagnoses with ICD-10 validation and temporal constraints, improving robustness and clinical relevance. Achieves high accuracy on real-world radiology reports.
+# MRI Report LLM Classification
+
+This project implements an LLM-based pipeline for brain MRI report classification. 
+It includes structured report parsing, ICD-10-based clinical filtering, and multi-model ensemble prediction.
+
+## Features
+- JSON-based report structuring
+- Multi-LLM ensemble classification
+- ICD-10 validation with clinical constraints
+- Temporal filtering of diagnoses
+
+## Usage
+1. Prepare input CSV
+2. Set API key:
+   export AZURE_OPENAI_API_KEY=...
+3. Run:
+   sbatch slurm/run_gpt_mri.slurm
