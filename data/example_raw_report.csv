@@ -1,4 +1,4 @@
-id,json_report
+id,input
 M0001,"MRI brain without contrast. There is no acute intracranial abnormality. No diffusion restriction to suggest acute infarction. Ventricles and sulci are normal in size and configuration. No mass, mass effect, or midline shift. Impression: Normal MRI brain."
 M0002,"MRI brain with and without contrast. There are scattered periventricular and subcortical T2/FLAIR hyperintensities consistent with chronic small vessel ischaemic changes (Fazekas grade 2). No acute infarction. Mild generalised cerebral volume loss in keeping with the patient's age. No abnormal enhancement. Impression: Moderate white matter hyperintensities; mild cerebral atrophy."
 M0003,"MRI brain without contrast. DWI sequences demonstrate restricted diffusion in the left MCA territory consistent with an acute ischaemic infarction. There is associated FLAIR hyperintensity. No haemorrhagic transformation. Impression: Acute left MCA territory infarction."
