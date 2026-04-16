@@ -15,7 +15,7 @@ SCRIPT="$REPO_DIR/scripts/inference/classification/run_classification_deepseek_3
 
 MODEL="path/to/model/DeepSeek-R1-Distill-Qwen-32B"
 IN_CSV="$REPO_DIR/data/example/example_json_report"
-PROMPT="$REPO_DIR/prompts/prompt_classification.txt"
+PROMPT="$REPO_DIR/prompts/prompt_mri_classification.txt"
 OUT_CSV="path/to/output/classification_deepseek_32B.csv"
 INVALID_CSV="path/to/output/invalid_deepseek_32B.csv"
 # ─────────────────────────────────────────────────────────────────────────────
