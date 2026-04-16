@@ -50,27 +50,52 @@ def build_prompt(system_message, report_id, report_input):
         {"role": "user", "content": "Here's an example of how to process a report:"},
         {"role": "user", "content": """
     Example Input:
-    ID: 6
+    ID: M0005
     input:
-Clinical indication:
-39-year-old female headache.
-
-Technique:
-Multiplanar multi-sequence MR images of the brain were obtained without intravenous contrast administration.
-
-Comparison:
-Brain MRI 3/21/2013
-
-Findings:
-The left mesial precentral gyrus cavernoma shows ill-defined T2/FLAIR hyperintense and T1-isotense signal
-extending inferolaterally, which may represent edema. There is mild interval increase in size of the lesion,
-currently measuring 1.5 x 1.3 cm, previously 1.3 x 1.0 cm. The lesion remains heterogenous centrally,
-demonstrating T1 and T2 hyperintensity, a T1-isointense/T2-hypointense rim, and susceptibility.
-There is no midline shift. There is no evidence of a diffusion abnormality to suggest acute or subacute infarction.
-
-Impression:
-Mild interval increase in size with associated minimal vasogenic edema of the paramedian left precentral
-gyral cavernous malformation.
+       {
+         "quality_dec": false,
+         "clinical_indication": [
+           {
+             "age": null,
+             "gender": null,
+             "symptom": null,
+             "history": null
+           }
+         ],
+         "comparison": [],
+         "lesions": [
+           {
+             "type": "demyelinating lesions",
+             "location": [
+               {
+                 "side": null,
+                 "region": [
+                   "periventricular",
+                   "juxtacortical",
+                   "infratentorial white matter"
+                 ]
+               }
+             ],
+             "size": null,
+             "radiological_changes": {
+               "T2/FLAIR": [
+                 "hyperintensity"
+               ]
+             },
+             "characteristics": [
+               "ovoid",
+               "Dawson fingers"
+             ],
+             "compare_pre": null,
+             "diagnosis": {
+               "multiple sclerosis": [
+                 "highly suggestive"
+               ]
+             }
+           }
+         ],
+         "additional_findings": null
+       }
 
     Example Output:
     3
