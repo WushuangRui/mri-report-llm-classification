@@ -13,11 +13,11 @@
 REPO_DIR="$HOME/mri-report-llm-classification"
 SCRIPT="$REPO_DIR/scripts/inference/classification/run_classification_deepseek_32B.py"
 
-MODEL="/gpfs/data/shenlab/LLMs/DeepSeek/distilled_model/DeepSeek-R1-Distill-Qwen-32B"
-IN_CSV="/gpfs/home/wr2215/ms_mri_deepseek/mri_classification/processed_json_test_subset680.csv"
-PROMPT="$REPO_DIR/prompts/prompt_classification_14.txt"
-OUT_CSV="/gpfs/home/wr2215/ms_mri_deepseek/results/classification_deepseek_32B.csv"
-INVALID_CSV="/gpfs/home/wr2215/ms_mri_deepseek/results/invalid_deepseek_32B.csv"
+MODEL="path/to/model/DeepSeek-R1-Distill-Qwen-32B"
+IN_CSV="$REPO_DIR/data/example/example_json_report"
+PROMPT="$REPO_DIR/prompts/prompt_classification.txt"
+OUT_CSV="path/to/output/classification_deepseek_32B.csv"
+INVALID_CSV="path/to/output/invalid_deepseek_32B.csv"
 # ─────────────────────────────────────────────────────────────────────────────
 
 cd "$REPO_DIR" || exit 1
