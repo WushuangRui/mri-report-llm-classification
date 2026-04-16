@@ -14,8 +14,8 @@ REPO_DIR="$HOME/mri-report-llm-classification"
 SCRIPT="$REPO_DIR/scripts/inference/classification/run_classification_gemma_27B.py"
 
 MODEL="path/to/model/gemma-3-27b-it-int4-awq"
-IN_CSV="path/to/data/example/example_json_report"
-PROMPT="$REPO_DIR/prompts/prompt_classification.txt"
+IN_CSV="$REPO_DIR/data/example/example_json_report"
+PROMPT="$REPO_DIR/prompts/prompt_mri_classification.txt"
 OUT_CSV="path/to/output/classification_gemma_27B.csv"
 INVALID_CSV="path/to/output/invalid_gemma_27B.csv"
 # ─────────────────────────────────────────────────────────────────────────────
