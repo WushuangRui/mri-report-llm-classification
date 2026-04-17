@@ -1,0 +1,19 @@
+﻿icd10_category,category_name
+I63,Cerebral infarction
+I61,Intracerebral hemorrhage
+S06.3,Focal brain injury
+S06.4,Epidural hemorrhage
+S06.5,Traumatic subdural hemorrhage
+C71,Malignant neoplasm of brain
+D32,Benign neoplasm of meninges
+C79.31,Secondary malignant neoplasm of brain
+C83.390,"Diffuse large B-cell lymphoma, unspecified site"
+G06.0,Intracranial abscess and granuloma
+G04.0,Acute disseminated encephalitis
+B00.4,Herpesviral encephalitis
+G91,Hydrocephalus
+A81.2,Progressive multifocal leukoencephalopathy
+G35,Multiple sclerosis
+G36,Other acute disseminated demyelination
+D33.3,Benign neoplasm of cranial nerves
+Q04.0,"Congenital malformation of brain, unspecified"
